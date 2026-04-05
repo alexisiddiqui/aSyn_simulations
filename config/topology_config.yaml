@@ -1,0 +1,64 @@
+paths:
+  repo_root: "/Users/alexi/Documents/aSyn_simulations"
+  gmx: "/Users/alexi/gromacs-2026/bin/gmx"
+  output_dir: "topology_output"
+  conda_env: "amber"
+
+protein:
+  input_pdb: "templates/protein/aSyn_s20_r1_msa1-127_n12700_do1_20260329_025853_protonated_max_plddt_12691.pdb"
+  forcefield: "amber19sb"
+  water_model: "opc"
+
+conditions:
+  saline:
+    ph: 7.4
+    ligands: []
+  tris:
+    ph: 7.4
+    ligands: [TR1, TR0]
+  extracellular:
+    ph: 7.4
+    ligands: [TR1, TR0]
+  intracellular:
+    ph: 7.2
+    ligands: [TR1, TR0]
+  lysosomal:
+    ph: 4.9
+    ligands: [CI1, CI2]
+
+ligands:
+  TR1:
+    mol2: "templates/mol2/tris.mol2"
+    net_charge: 1
+    resname: "TR1"
+    description: "Tris+ buffer cation"
+
+  TR0:
+    mol2: "templates/mol2/tris_neutral.mol2"
+    net_charge: 0
+    resname: "TR0"
+    description: "Neutral Tris buffer"
+
+  CI1:
+    mol2: "templates/mol2/citrate_minus.mol2"
+    net_charge: -1
+    resname: "CI1"
+    description: "Citrate(-1)"
+
+  CI2:
+    mol2: "templates/mol2/citrate2_minus.mol2"
+    net_charge: -2
+    resname: "CI2"
+    description: "Citrate(-2)"
+
+protonation:
+  "7.4":
+    his_method: "auto"
+    overrides: {}
+  "7.2":
+    his_method: "auto"
+    overrides: {}
+  "4.9":
+    his_method: "HIP"
+    overrides:
+      "A:50": "HIP"

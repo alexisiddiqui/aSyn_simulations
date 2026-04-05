@@ -1,0 +1,7 @@
+verbosity 1
+source leaprc.gaff2
+CI1 = loadmol2 /Users/alexi/Documents/aSyn_simulations/topology_output/ligands/CI1/CI1_AC.mol2
+loadamberparams /Users/alexi/Documents/aSyn_simulations/topology_output/ligands/CI1/CI1_AC.frcmod
+check CI1
+saveamberparm CI1 /Users/alexi/Documents/aSyn_simulations/topology_output/ligands/CI1/CI1_AC.prmtop /Users/alexi/Documents/aSyn_simulations/topology_output/ligands/CI1/CI1_AC.inpcrd
+quit
