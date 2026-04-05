@@ -19095,6 +19095,10 @@ Protein_chain_A     3
 #include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp"
 #endif
 
+#ifdef DPOSRESca
+#include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posreca.itp"
+#endif
+
 ; Include water topology
 #include "amber19sb.ff/opc.itp"
 

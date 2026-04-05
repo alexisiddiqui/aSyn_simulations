@@ -1,0 +1,47 @@
+box:
+  size_nm: 10.0
+  shape: cubic   # cubic | dodecahedron
+
+buffer:
+  concentration_mm: 20.0
+
+neutralization:
+  ion: CL
+  charge: -1
+
+conditions:
+  saline:
+    buffer_species: {}
+    ions:
+      NA: {conc_mm: 150, charge: 1}
+      K:  {conc_mm: 150, charge: 1}
+  tris:
+    buffer_species:
+      TR1: 1.0
+      TR0: 0.22
+    ions: {}
+  extracellular:
+    buffer_species:
+      TR1: 1.0
+      TR0: 0.22
+    ions:
+      NA: {conc_mm: 143, charge: 1}
+      K:  {conc_mm: 4,   charge: 1}
+      CA: {conc_mm: 2.5, charge: 2}
+      MG: {conc_mm: 0.7, charge: 2}
+  intracellular:
+    buffer_species:
+      TR1: 1.0
+      TR0: 0.11
+    ions:
+      NA: {conc_mm: 15,  charge: 1}
+      K:  {conc_mm: 140, charge: 1}
+      CA: {conc_mm: 0.0001, charge: 2, min_count: 0}   # 100 nM -> skip
+      MG: {conc_mm: 10,  charge: 2}
+  lysosomal:
+    buffer_species:
+      CI2: 1.0
+      CI1: 0.71875    # 23/32
+    ions:
+      NA: {conc_mm: 20, charge: 1}
+      K:  {conc_mm: 60, charge: 1}

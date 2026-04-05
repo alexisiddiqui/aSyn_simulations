@@ -1,0 +1,64 @@
+# Simulation stage definitions for aSyn MD pipeline
+# Each stage specifies:
+#   - mdp: path to MDP file
+#   - use_posres_ref: whether to pass -r <prev.gro> to grompp
+#   - continuation: whether to pass -t <prev.cpt> to grompp
+#   - replicated: whether to run n_replicates times with _rep{N} suffix
+#   - depends_on: (optional) if set, use this stage's matching rep output as input
+
+stages:
+  - name: 1_minim
+    mdp: config/GROMACS/1_minim.mdp
+    use_posres_ref: true
+    continuation: false
+    replicated: false
+
+  - name: 2_equil
+    mdp: config/GROMACS/2_equil.mdp
+    use_posres_ref: true
+    continuation: false
+    replicated: false
+
+  - name: 3_equil
+    mdp: config/GROMACS/3_equil.mdp
+    use_posres_ref: true
+    continuation: true
+    replicated: false
+
+  - name: 4_equil
+    mdp: config/GROMACS/4_equil.mdp
+    use_posres_ref: true
+    continuation: true
+    replicated: false
+
+  - name: 5_equil
+    mdp: config/GROMACS/5_equil.mdp
+    use_posres_ref: true
+    continuation: true
+    replicated: false
+
+  - name: 6_equil
+    mdp: config/GROMACS/6_equil.mdp
+    use_posres_ref: false
+    continuation: true
+    replicated: false
+
+  - name: 7_relax
+    mdp: config/GROMACS/7_relax.mdp
+    use_posres_ref: false
+    continuation: false
+    replicated: true
+
+  - name: 8_prod_1ns_test
+    mdp: config/GROMACS/8_prod_1ns_test.mdp
+    use_posres_ref: false
+    continuation: true
+    replicated: true
+    depends_on: 7_relax
+
+  - name: 8_prod
+    mdp: config/GROMACS/8_prod.mdp
+    use_posres_ref: false
+    continuation: true
+    replicated: true
+    depends_on: 8_prod_1ns_test
