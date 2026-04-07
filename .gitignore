@@ -214,3 +214,4 @@ gromacs-2026.1
 # ignore system_output/ and topology_output/ directories
 system_output/
 topology_output/
+simulation_output/

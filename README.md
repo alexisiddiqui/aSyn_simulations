@@ -78,4 +78,6 @@ Tris, saline, extracellular, intracellular, lysosomal
 
 Amber tools available at 'amber' conda environment.
 # Setup ambertools env
-conda create -n amber -c conda-forge ambertools
+mamba create -n amber -c conda-forge ambertools
+# Setup psiresp env
+mamba create -n psiresp -c conda-forge psiresp

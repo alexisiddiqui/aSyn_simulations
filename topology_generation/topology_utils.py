@@ -149,55 +149,10 @@ def fix_mol2_resname(src: Path, dst: Path, new_resname: str) -> None:
         f.writelines(output_lines)
 
 
-def preprocess_pdb_for_ph(src: Path, dst: Path, ph_config: dict) -> None:
-    """Prepare pH-adjusted PDB for pdb2gmx by renaming residues.
-
-    Args:
-        src: Input PDB file
-        dst: Output PDB file
-        ph_config: Dict with 'his_method' ('auto' or 'HIP') and 'overrides' dict
-                   (keyed by "chain:resnum")
-    """
-    src = Path(src)
-    dst = Path(dst)
-
-    his_method = ph_config.get("his_method", "auto")
-    overrides = ph_config.get("overrides", {})
-
-    with open(src) as f:
-        lines = f.readlines()
-
-    output_lines = []
-
-    for line in lines:
-        if line.startswith("ATOM") or line.startswith("HETATM"):
-            # PDB fixed-width format:
-            # columns 17-20 (0-indexed 16-19) contain the residue name
-            # columns 22-26 (0-indexed 21-25) contain the residue number
-            # column 22 (0-indexed 21) is the chain ID
-
-            resname = line[17:20].strip()
-            chain = line[21].strip()
-            resnum = line[22:26].strip()
-
-            # Check for per-residue override
-            override_key = f"{chain}:{resnum}"
-            if override_key in overrides:
-                new_resname = overrides[override_key]
-            elif his_method == "HIP" and resname == "HIS":
-                # Global HIS->HIP rename for pH 4.9
-                new_resname = "HIP"
-            else:
-                new_resname = resname
-
-            # Rewrite residue name field (columns 17-20, 0-indexed 17-19)
-            new_resname_padded = new_resname.rjust(3)  # Right-justify in 3-char field
-            line = line[:17] + new_resname_padded + line[20:]
-
-        output_lines.append(line)
-
-    with open(dst, "w") as f:
-        f.writelines(output_lines)
+# NOTE: preprocess_pdb_for_ph has been removed.
+# Protonation is now handled by protonation_utils.run_pdb2pqr (PropKa-based),
+# followed by protonation_utils.apply_manual_overrides for per-residue config
+# overrides. See topology_generation/protonation_utils.py.
 
 
 def validate_files_exist(paths: list[Path], context: str) -> None:

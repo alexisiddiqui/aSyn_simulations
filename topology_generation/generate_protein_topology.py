@@ -4,7 +4,8 @@ import os
 import subprocess
 from pathlib import Path
 
-from topology_utils import load_config, preprocess_pdb_for_ph, run_cmd, validate_files_exist
+from protonation_utils import apply_manual_overrides, run_pdb2pqr, summarise_protonation
+from topology_utils import load_config, run_cmd, validate_files_exist
 
 
 def process_ph(
@@ -52,20 +53,35 @@ def process_ph(
         print(f"✓ Outputs already exist. Skipping (use --force to re-run)")
         return work_dir
 
-    # Step 1: Preprocess PDB for pH
-    print(f"\nPreprocessing PDB for pH {ph}...")
-    pdb_preprocessed = work_dir / "aSyn_preprocessed.pdb"
-    preprocess_pdb_for_ph(pdb_src, pdb_preprocessed, ph_prot_cfg)
-    print(f"  → {pdb_preprocessed}")
+    # Step 1: PropKa protonation via pdb2pqr
+    print(f"\nRunning pdb2pqr (PropKa) at pH {ph}...")
+    pdb_protonated = work_dir / "aSyn_pdb2pqr.pdb"
+    run_pdb2pqr(pdb_src, pdb_protonated, ph, work_dir)
+    print(f"  → {pdb_protonated}")
 
-    # Step 2: Run pdb2gmx
+    # Step 2: Apply per-residue overrides from config
+    overrides = ph_prot_cfg.get("overrides", {})
+    if overrides:
+        print(f"  Applying {len(overrides)} manual override(s): {overrides}")
+        apply_manual_overrides(pdb_protonated, overrides)
+
+    # Log titratable residue summary
+    prot_summary = summarise_protonation(pdb_protonated)
+    if prot_summary:
+        print(f"  Titratable residues assigned:")
+        for resname, residues in sorted(prot_summary.items()):
+            print(f"    {resname}: {', '.join(residues)}")
+    else:
+        print(f"  No non-standard titratable residues detected (all HIS are neutral)")
+
+    # Step 3: Run pdb2gmx
     print(f"\nRunning pdb2gmx...")
     gro_out = work_dir / "protein.gro"
     top_out = work_dir / "protein.top"
     itp_out = work_dir / "posre.itp"
 
     run_pdb2gmx(
-        pdb_preprocessed,
+        pdb_protonated,
         gro_out,
         top_out,
         itp_out,
@@ -78,7 +94,7 @@ def process_ph(
     print(f"  → {top_out}")
     print(f"  → {itp_out}")
 
-    # Step 3: Validation
+    # Step 4: Validation
     print(f"\nValidating outputs...")
     validate_protein_outputs(work_dir)
 

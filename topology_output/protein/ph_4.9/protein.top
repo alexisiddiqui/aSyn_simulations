@@ -1,8 +1,8 @@
 ;
 ;	File '/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top' was generated
-;	By user: alexi (501)
+;	By user: root (501)
 ;	On host: Teal.local
-;	At date: Sun Apr  5 02:51:44 2026
+;	At date: Tue Apr  7 15:56:25 2026
 ;
 ;	This is a standalone topology file
 ;
@@ -13,7 +13,7 @@
 ;	Data prefix:  /Users/alexi/gromacs-2026
 ;	Working dir:  /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9
 ;	Command line:
-;	  gmx pdb2gmx -f /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/aSyn_preprocessed.pdb -o /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.gro -p /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top -i /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp -ff amber19sb -water opc -ignh
+;	  gmx pdb2gmx -f /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/aSyn_pdb2pqr.pdb -o /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.gro -p /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top -i /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp -ff amber19sb -water opc -ignh
 ;	Force field was read from the standard GROMACS share directory.
 ;
 
@@ -2181,8 +2181,8 @@ Protein_chain_A     3
   2013         HC    140   CALA    HB2   2013     0.0764      1.008
   2014         HC    140   CALA    HB3   2014     0.0764      1.008
   2015          C    140   CALA      C   2015     0.7731      12.01
-  2016         O2    140   CALA    OXT   2016    -0.8055         16
-  2017         O2    140   CALA      O   2017    -0.8055         16   ; qtot -8
+  2016         O2    140   CALA      O   2016    -0.8055         16
+  2017         O2    140   CALA    OXT   2017    -0.8055         16   ; qtot -8
 
 [ bonds ]
 ;  ai    aj funct            c0            c1            c2            c3
@@ -18947,7 +18947,7 @@ Protein_chain_A     3
  1994  2007  2005  2006     4 
  1999  2003  2002  2004     4 
  2005  2009  2007  2008     4 
- 2009  2017  2015  2016     4 
+ 2009  2016  2015  2017     4 
 
 [ cmap ]
 ;  ai    aj    ak    al    am funct            c0            c1
@@ -19095,10 +19095,6 @@ Protein_chain_A     3
 #include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp"
 #endif
 
-#ifdef DPOSRESca
-#include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posreca.itp"
-#endif
-
 ; Include water topology
 #include "amber19sb.ff/opc.itp"
 
@@ -19114,7 +19110,7 @@ Protein_chain_A     3
 
 [ system ]
 ; Name
-MDANALYSIS FRAME 0: Created by PDBWriter
+Protein
 
 [ molecules ]
 ; Compound        #mols
