@@ -8,7 +8,6 @@ Provides:
 """
 
 import subprocess
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -16,6 +15,7 @@ from pathlib import Path
 @dataclass
 class StageConfig:
     """Metadata for a single simulation stage."""
+
     name: str
     mdp: str
     use_posres_ref: bool
@@ -42,7 +42,7 @@ def run_gmx(gmx_path: str, args: list, cwd: Path, label: str, stdin: str = None)
     cmd = [gmx_path] + args
 
     try:
-        with open(log_file, 'w') as log:
+        with open(log_file, "w") as log:
             result = subprocess.run(
                 cmd,
                 cwd=cwd,
@@ -50,7 +50,6 @@ def run_gmx(gmx_path: str, args: list, cwd: Path, label: str, stdin: str = None)
                 stderr=subprocess.STDOUT,
                 text=True,
                 input=stdin,
-                timeout=3600
             )
     except subprocess.TimeoutExpired:
         raise RuntimeError(f"{label} timed out after 1 hour. Log: {log_file}")
@@ -76,7 +75,7 @@ def run_make_ndx(gmx_path: str, gro_file: Path, ndx_file: Path, cwd: Path) -> No
         print(f"  Index file already exists: {ndx_file.name}")
         return
 
-    args = ['make_ndx', '-f', str(gro_file), '-o', str(ndx_file)]
+    args = ["make_ndx", "-f", str(gro_file), "-o", str(ndx_file)]
     run_gmx(gmx_path, args, cwd, "make_ndx", stdin="q\n")
 
 
@@ -107,20 +106,26 @@ def run_grompp(
         cpt_file: Checkpoint for continuation (-t), optional
     """
     args = [
-        'grompp',
-        '-f', str(mdp_file),
-        '-c', str(coord_file),
-        '-p', str(top_file),
-        '-n', str(ndx_file),
-        '-o', str(tpr_file),
-        '-maxwarn', '2'
+        "grompp",
+        "-f",
+        str(mdp_file),
+        "-c",
+        str(coord_file),
+        "-p",
+        str(top_file),
+        "-n",
+        str(ndx_file),
+        "-o",
+        str(tpr_file),
+        "-maxwarn",
+        "2",
     ]
 
     if ref_file and ref_file.exists():
-        args.extend(['-r', str(ref_file)])
+        args.extend(["-r", str(ref_file)])
 
     if cpt_file and cpt_file.exists():
-        args.extend(['-t', str(cpt_file)])
+        args.extend(["-t", str(cpt_file)])
 
     run_gmx(gmx_path, args, cwd, label)
 
@@ -134,5 +139,18 @@ def run_mdrun(gmx_path: str, tpr_file: Path, cwd: Path, label: str = "mdrun") ->
         cwd: Working directory
         label: Log label
     """
-    args = ['mdrun', '-v', '-deffnm', 'md', '-s', str(tpr_file)]
+    args = [
+        "mdrun",
+        "-v",
+        "-deffnm",
+        "md",
+        "-s",
+        str(tpr_file),
+        "-ntmpi",
+        "1",
+        "-ntomp",
+        "4",
+        "-pin",
+        "on",
+    ]
     run_gmx(gmx_path, args, cwd, label)

@@ -21,8 +21,8 @@ Alpha-synuclein MD simulation project needs parameterized topologies for 4 condi
 
 ```yaml
 paths:
-  repo_root: "/Users/alexi/Documents/aSyn_simulations"
-  gmx: "/Users/alexi/gromacs-2026/bin/gmx"
+  repo_root: "/home/alexi/Documents/aSyn_simulations"
+  gmx: "/home/alexi/gromacs-2026/bin/gmx"
   output_dir: "topology_output"
   conda_env: "amber"
 

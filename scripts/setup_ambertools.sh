@@ -1,1 +1,1 @@
-conda create -n amber -c conda-forge ambertools
+conda create -n amber -c conda-forge ambertools -y

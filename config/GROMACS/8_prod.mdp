@@ -48,9 +48,9 @@ energygrps               =
 ; cut-off scheme (Verlet: particle based cut-offs, group: using charge groups)
 cutoff-scheme            = Verlet
 ; nblist update frequency
-nstlist                  = 10
+nstlist                  = 20
 ; ns algorithm (simple or grid)
-ns-type                  = Grid
+; ns-type                  = Grid (Obsolete)
 ; Periodic boundary conditions: xyz, no, xy
 pbc                      = xyz
 periodic-molecules       = no
@@ -71,9 +71,9 @@ epsilon-r                = 1
 epsilon-rf               = 0
 ; Method for doing Van der Waals
 vdwtype                  = Cut-off
-vdw-modifier             = None ; this matches Amber
+vdw-modifier             = Force-switch
 ; cut-off lengths       
-rvdw_switch              = 1.0
+rvdw_switch              = 0.8
 rvdw                     = 1.0
 ; Apply long range dispersion corrections for Energy and Pressure
 DispCorr                 = EnerPres ; This is default in AMBER, ??? AllEnerPres what is it?
@@ -98,7 +98,7 @@ constraints              = h-bonds ; this is a tweak fro all-bonds to allow grom
 ; Type of constraint algorithm
 constraint_algorithm     = LINCS ; this is better than SHAKE so we retain it
 ; Do not constrain the start configuration
-continuation             = no
+continuation             = yes
 ; Highest order in the expansion of the constraint coupling matrix
 lincs-order              = 4
 ; Number of iterations in the final step of LINCS. 1 is fine for
@@ -128,11 +128,11 @@ tc-grps                  = Protein Non-Protein ; NOTE: Group name "System" is de
 tau-t                    = 1 1 ; 1 ps for each group (Protein, Non-Protein)
 ref-t                    = 300 300
 ; pressure coupling     
-pcoupl                   = Parrinello-Rahman
+pcoupl                   = c-rescale
 pcoupltype               = Isotropic
 nstpcouple               = -1
 ; Time constant (ps), compressibility (1/bar) and reference P (bar)
-tau-p                    = 1
+tau-p                    = 5
 compressibility          = 4.5e-5 ; for water
 ref-p                    = 1 ; 1 bar
 ; Scaling of reference coordinates, No, All or COM
