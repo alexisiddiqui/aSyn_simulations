@@ -100,6 +100,7 @@ def process_condition(
     system_root: Path,
     output_root: Path,
     n_replicates: int = 3,
+    run_replicate: int = None,
     through_stage: str = None,
     single_stage: str = None,
     force: bool = False,
@@ -177,7 +178,7 @@ def process_condition(
 
     for stage in stages_to_run:
         if stage.replicated:
-            run_replicated_stage(stage, work_dir, gmx_path, stages, n_replicates, force)
+            run_replicated_stage(stage, work_dir, gmx_path, stages, n_replicates, run_replicate, force)
         else:
             run_single_stage(stage, work_dir, gmx_path, stages, force)
 
@@ -256,6 +257,7 @@ def run_replicated_stage(
     gmx_path: str,
     stages_config: list[StageConfig],
     n_replicates: int,
+    run_replicate: int = None,
     force: bool = False,
 ) -> None:
     """Run a replicated stage n_replicates times.
@@ -270,7 +272,16 @@ def run_replicated_stage(
     """
     print(f"  [{stage.name}] (×{n_replicates} replicates)")
 
-    for rep in range(1, n_replicates + 1):
+    if run_replicate is not None:
+        if run_replicate < 1 or run_replicate > n_replicates:
+            raise ValueError(
+                f"Replicate {run_replicate} out of range (1-{n_replicates}) for stage {stage.name}"
+            )
+        replicates_to_run = [run_replicate]
+    else:
+        replicates_to_run = list(range(1, n_replicates + 1))
+
+    for rep in replicates_to_run:
         stage_dir = work_dir / f"{stage.name}_rep{rep}"
         stage_dir.mkdir(parents=True, exist_ok=True)
 
@@ -361,6 +372,12 @@ def main():
         help="Number of replicates for replicated stages",
     )
     parser.add_argument(
+        "--replicate",
+        type=int,
+        default=None,
+        help="Run only this specific replicate (1-indexed)",
+    )
+    parser.add_argument(
         "--system-output",
         type=Path,
         default=None,
@@ -420,6 +437,7 @@ def main():
             system_root=system_root,
             output_root=output_root,
             n_replicates=args.n_replicates,
+            run_replicate=args.replicate,
             through_stage=args.through,
             single_stage=args.stage,
             force=args.force,

@@ -39,6 +39,7 @@ def process_ligand(
     mol2_src = ligand_cfg["mol2"]
     net_charge = ligand_cfg["net_charge"]
     resname = ligand_cfg["resname"]
+    charge_method = ligand_cfg.get("charge_method", "bcc")
 
     print(f"\n{'='*60}")
     print(f"Processing ligand: {ligand_name} ({resname})")
@@ -59,10 +60,26 @@ def process_ligand(
     fix_mol2_resname(mol2_src, mol2_fixed, resname)
     print(f"  → {mol2_fixed}")
 
-    # Step 2: Antechamber
-    print(f"\n[2/5] Running antechamber (AM1-BCC charges, GAFF2 typing)...")
-    mol2_ac = step2_antechamber(mol2_fixed, work_dir, resname, net_charge, conda_env)
+    # Step 1b: RESP charges (optional)
+    mol2_resp = None
+    if charge_method == "resp":
+        print(f"\n[1b/5] Calculating RESP charges via psiresp...")
+        resp_env = ligand_cfg.get("resp_env", "psiresp")
+        charge_settings = ligand_cfg.get("charge_settings", {})
+        mol2_resp = step1b_resp(mol2_fixed, work_dir, resname, net_charge, resp_env, charge_settings)
+        print(f"  → {mol2_resp}")
+
+    # Step 2: Antechamber (GAFF2 typing)
+    # We always use BCC charges for typing to avoid antechamber parsing errors, 
+    # then we'll replace them with RESP if requested.
+    print(f"\n[2/5] Running antechamber (BCC charges, GAFF2 typing)...")
+    mol2_ac = step2_antechamber(mol2_fixed, work_dir, resname, net_charge, conda_env, charge_type="bcc")
     print(f"  → {mol2_ac}")
+
+    # Step 2b: Inject RESP charges if applicable
+    if charge_method == "resp" and mol2_resp:
+        print(f"[2b/5] Injecting RESP charges into {mol2_ac.name}...")
+        inject_resp_charges(mol2_resp, mol2_ac)
 
     # Step 3: Parmchk2
     print(f"\n[3/5] Running parmchk2 (force field parameters)...")
@@ -98,8 +115,47 @@ def process_ligand(
     return work_dir
 
 
+def step1b_resp(
+    mol2_in: Path,
+    work_dir: Path,
+    resname: str,
+    net_charge: int,
+    resp_env: str,
+    settings: dict,
+) -> Path:
+    """Run calculate_resp_charges.py via conda."""
+    mol2_out = work_dir / f"{resname}_RESP.mol2"
+    resp_workdir = work_dir / "resp_qm_scratch"
+    
+    repo_root = Path(os.getcwd())
+    script_path = repo_root / "topology_generation" / "calculate_resp_charges.py"
+    
+    cmd = conda_cmd(
+        [
+            "python",
+            str(script_path.absolute()),
+            "-i", str(mol2_in),
+            "-o", str(mol2_out),
+            "-nc", str(net_charge),
+            "-b", settings.get("basis_set", "6-31G*"),
+            "-f", settings.get("functional", "B3LYP"),
+            "-n", str(settings.get("n_conformers", 1)),
+            "-w", str(resp_workdir),
+        ],
+        resp_env,
+    )
+    
+    run_cmd(cmd, work_dir, f"psiresp_{resname}")
+    return mol2_out
+
+
 def step2_antechamber(
-    mol2_in: Path, work_dir: Path, resname: str, net_charge: int, conda_env: str
+    mol2_in: Path,
+    work_dir: Path,
+    resname: str,
+    net_charge: int,
+    conda_env: str,
+    charge_type: str = "bcc",
 ) -> Path:
     """Run antechamber via conda.
 
@@ -119,7 +175,7 @@ def step2_antechamber(
             "-fo",
             "mol2",
             "-c",
-            "bcc",
+            charge_type,
             "-nc",
             str(net_charge),
             "-at",
@@ -283,9 +339,14 @@ def validate_ligand_outputs(work_dir: Path, resname: str, mol2_src: Path) -> Non
         work_dir / f"{resname}_AC.frcmod",
         work_dir / f"{resname}_AC.prmtop",
         work_dir / f"{resname}_AC.inpcrd",
-        work_dir / f"{resname}_GMX.itp",  # extracted from .top
-        work_dir / f"{resname}_GMX.top",  # full acpype output
+        work_dir / f"{resname}_GMX.itp",
+        work_dir / f"{resname}_GMX.top",
     ]
+
+    # Add optional RESP file if it exists
+    mol2_resp = work_dir / f"{resname}_RESP.mol2"
+    if mol2_resp.exists():
+        required_files.append(mol2_resp)
 
     for fpath in required_files:
         if not fpath.exists():
@@ -359,6 +420,66 @@ def validate_ligand_outputs(work_dir: Path, resname: str, mol2_src: Path) -> Non
     print(f"  ✓ All validations passed")
 
 
+def inject_resp_charges(mol2_resp: Path, mol2_ac: Path):
+    """Replace charges in GAFF2 MOL2 with those from RESP MOL2.
+    
+    This avoids antechamber's picky '-c rc' formatting requirements.
+    """
+    # Read charges from RESP MOL2
+    with open(mol2_resp) as f:
+        resp_lines = f.readlines()
+    
+    resp_charges = []
+    in_atom = False
+    for line in resp_lines:
+        if line.startswith("@<TRIPOS>ATOM"):
+            in_atom = True
+            continue
+        if in_atom and line.startswith("@<TRIPOS>"):
+            in_atom = False
+            continue
+        if in_atom and line.strip():
+            resp_charges.append(line.split()[8])
+            
+    # Read GAFF2 MOL2
+    with open(mol2_ac) as f:
+        ac_lines = f.readlines()
+        
+    out_lines = []
+    in_atom = False
+    atom_idx = 0
+    for line in ac_lines:
+        if line.startswith("@<TRIPOS>ATOM"):
+            in_atom = True
+            out_lines.append(line)
+            continue
+        if in_atom and line.startswith("@<TRIPOS>"):
+            in_atom = False
+            out_lines.append(line)
+            continue
+        if in_atom and line.strip():
+            parts = line.split()
+            if atom_idx < len(resp_charges):
+                new_charge = resp_charges[atom_idx]
+                # Reconstruct line replacing the 9th column (index 8)
+                # MOL2: ID NAME X Y Z TYPE SUBST_ID SUBST_NAME CHARGE
+                # Use standard spacing found in antechamber outputs
+                row = "{:>7} {:<8} {:>10.4f} {:>10.4f} {:>10.4f} {:<8} {:>5} {:<8} {:10.6f}\n".format(
+                    parts[0], parts[1], float(parts[2]), float(parts[3]), float(parts[4]),
+                    parts[5], parts[6], parts[7], float(new_charge)
+                )
+                out_lines.append(row)
+                atom_idx += 1
+            else:
+                out_lines.append(line)
+        else:
+            out_lines.append(line)
+            
+    with open(mol2_ac, "w") as f:
+        f.writelines(out_lines)
+    print(f"  ✓ Injected {atom_idx} RESP charges into {mol2_ac.name}")
+
+
 def main():
     """Main entry point."""
     import argparse
@@ -411,6 +532,10 @@ def main():
         # Convert relative paths in config to absolute
         if not Path(ligand_cfg["mol2"]).is_absolute():
             ligand_cfg["mol2"] = repo_root / ligand_cfg["mol2"]
+
+        # Pass global charge settings down to ligand config
+        ligand_cfg["charge_settings"] = config.get("charge_settings", {})
+        ligand_cfg["resp_env"] = config["paths"].get("resp_env", "psiresp")
 
         process_ligand(ligand_name, ligand_cfg, output_root, conda_env, force=args.force)
 

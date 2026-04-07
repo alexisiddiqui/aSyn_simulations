@@ -3,6 +3,13 @@ paths:
   gmx: "/Users/alexi/gromacs-2026/bin/gmx"
   output_dir: "topology_output"
   conda_env: "amber"
+  resp_env: "psiresp_fixed"
+
+charge_settings:
+  method: "resp"
+  basis_set: "6-31G*"
+  functional: "B3LYP"
+  n_conformers: 1  # For testing, usually 2-5 for RESP
 
 protein:
   input_pdb: "templates/protein/aSyn_s20_r1_msa1-127_n12700_do1_20260329_025853_protonated_max_plddt_12691.pdb"
@@ -12,7 +19,7 @@ protein:
 conditions:
   saline:
     ph: 7.4
-    ligands: []
+    ligands: [TR1_RESP]
   tris:
     ph: 7.4
     ligands: [TR1, TR0]
@@ -31,24 +38,35 @@ ligands:
     mol2: "templates/mol2/tris.mol2"
     net_charge: 1
     resname: "TR1"
+    charge_method: "bcc"
     description: "Tris+ buffer cation"
+
+  TR1_RESP:
+    mol2: "templates/mol2/tris.mol2"
+    net_charge: 1
+    resname: "TR1"
+    charge_method: "resp"
+    description: "Tris+ buffer cation (RESP)"
 
   TR0:
     mol2: "templates/mol2/tris_neutral.mol2"
     net_charge: 0
     resname: "TR0"
+    charge_method: "bcc"
     description: "Neutral Tris buffer"
 
   CI1:
     mol2: "templates/mol2/citrate_minus.mol2"
     net_charge: -1
     resname: "CI1"
+    charge_method: "bcc"
     description: "Citrate(-1)"
 
   CI2:
     mol2: "templates/mol2/citrate2_minus.mol2"
     net_charge: -2
     resname: "CI2"
+    charge_method: "bcc"
     description: "Citrate(-2)"
 
 protonation:
