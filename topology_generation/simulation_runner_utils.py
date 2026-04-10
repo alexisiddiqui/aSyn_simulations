@@ -62,7 +62,7 @@ def run_gmx(gmx_path: str, args: list, cwd: Path, label: str, stdin: str = None)
     print(f"  → {label} complete ({log_file})")
 
 
-def run_make_ndx(gmx_path: str, gro_file: Path, ndx_file: Path, cwd: Path) -> None:
+def run_make_ndx(gmx_path: str, gro_file: Path, ndx_file: Path, cwd: Path, force: bool = False) -> None:
     """Run gmx make_ndx to generate index file.
 
     Args:
@@ -70,8 +70,9 @@ def run_make_ndx(gmx_path: str, gro_file: Path, ndx_file: Path, cwd: Path) -> No
         gro_file: Input coordinate file
         ndx_file: Output index file
         cwd: Working directory
+        force: If True, overwrite exist file
     """
-    if ndx_file.exists():
+    if ndx_file.exists() and not force:
         print(f"  Index file already exists: {ndx_file.name}")
         return
 
@@ -149,7 +150,7 @@ def run_mdrun(gmx_path: str, tpr_file: Path, cwd: Path, label: str = "mdrun") ->
         "-ntmpi",
         "1",
         "-ntomp",
-        "1",
+        "8",
         "-pin",
         "on",
     ]

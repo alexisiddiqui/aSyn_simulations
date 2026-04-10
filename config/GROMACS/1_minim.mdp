@@ -11,7 +11,7 @@ define                   = -DPOSRES -DPOSRES_FC=500.0 ; will trigger the inclusi
 
 ; RUN CONTROL PARAMETERS
 integrator               = steep ; Steepest descent integrator
-nsteps                   = 1000 ; (10000 steps default)
+nsteps                   = 10000 ; (10000 steps default)
 init-step                = 0 ; For exact run continuation or redoing part of a run
 simulation-part          = 1 ; Part index is updated automatically on checkpointing (keeps files separate)
 comm-mode                = Linear ; mode for center of mass motion removal

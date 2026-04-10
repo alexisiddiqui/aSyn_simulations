@@ -358,6 +358,7 @@ def run_editconf(
             "-c",
             "-box", str(box_size), str(box_size), str(box_size),
             "-bt", box_shape,
+            "-princ"
         ],
         work_dir,
         "editconf",
@@ -427,8 +428,12 @@ def run_solvate(
     top_path: Path,
     output_gro: Path,
     work_dir: Path,
+    water_model: str,
 ) -> None:
-    """Solvate the system with 4-site OPC water (tip4p.gro).
+    """Solvate the system with a model-aware solvent box.
+
+    Uses spc216.gro for 3-site models (opc3, tip3p, etc.)
+    and tip4p.gro for 4-site models (opc, tip4p).
 
     Args:
         gmx_path: Path to gmx executable
@@ -436,13 +441,27 @@ def run_solvate(
         top_path: Topology file (updated in-place with SOL count)
         output_gro: Solvated output structure
         work_dir: Working directory for log
+        water_model: Name of water model (e.g., 'opc3', 'tip3p', 'opc')
     """
+    # Select solvent box based on sites
+    three_site_models = ["opc3", "tip3p", "spce", "spc", "tip3p-fb"]
+    four_site_models = ["opc", "tip4p", "tip4p-fb", "tip4p-ew"]
+
+    if water_model.lower() in three_site_models:
+        solvent_box = "spc216.gro"
+    elif water_model.lower() in four_site_models:
+        solvent_box = "tip4p.gro"
+    else:
+        # Fallback to spc216 for unknown models, or we could raise error
+        print(f"  WARNING: Unknown water model {water_model!r}, defaulting to spc216.gro")
+        solvent_box = "spc216.gro"
+
     run_gmx(
         gmx_path,
         [
             "solvate",
             "-cp", str(input_gro),
-            "-cs", "tip4p.gro",
+            "-cs", solvent_box,
             "-o", str(output_gro),
             "-p", str(top_path),
         ],

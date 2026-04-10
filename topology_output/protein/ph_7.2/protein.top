@@ -2,7 +2,7 @@
 ;	File '/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/protein.top' was generated
 ;	By user: root (501)
 ;	On host: Teal.local
-;	At date: Tue Apr  7 15:56:26 2026
+;	At date: Fri Apr 10 23:02:58 2026
 ;
 ;	This is a standalone topology file
 ;
@@ -13,7 +13,7 @@
 ;	Data prefix:  /Users/alexi/gromacs-2026
 ;	Working dir:  /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2
 ;	Command line:
-;	  gmx pdb2gmx -f /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/aSyn_pdb2pqr.pdb -o /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/protein.gro -p /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/protein.top -i /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/posre.itp -ff amber19sb -water opc -ignh
+;	  gmx pdb2gmx -f /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/aSyn_pdb2pqr.pdb -o /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/protein.gro -p /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/protein.top -i /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/posre.itp -ff amber19sb -water opc3 -ignh
 ;	Force field was read from the standard GROMACS share directory.
 ;
 
@@ -19082,8 +19082,13 @@ Protein_chain_A     3
 #include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/posre.itp"
 #endif
 
+; Include C-alpha Position restraint file
+#ifdef POSRESca
+#include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_7.2/posre_ca.itp"
+#endif
+
 ; Include water topology
-#include "amber19sb.ff/opc.itp"
+#include "amber19sb.ff/opc3.itp"
 
 #ifdef POSRES_WATER
 ; Position restraint for each water oxygen
@@ -19093,7 +19098,7 @@ Protein_chain_A     3
 #endif
 
 ; Include topology for ions
-#include "amber19sb.ff/ions_opc.itp"
+#include "amber19sb.ff/ions_opc3.itp"
 
 [ system ]
 ; Name

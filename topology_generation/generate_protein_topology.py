@@ -90,13 +90,21 @@ def process_ph(
         water_model,
     )
 
+    modify_posre_to_use_macros(itp_out, macro_name="POSRES_FC")
+    
+    itp_ca_out = work_dir / "posre_ca.itp"
+    generate_ca_restraints(gro_out, itp_ca_out, gmx_path)
+    modify_posre_to_use_macros(itp_ca_out, macro_name="POSRESca_FC")
+    patch_topology_for_ca_restraints(top_out)
+
     print(f"  → {gro_out}")
     print(f"  → {top_out}")
     print(f"  → {itp_out}")
+    print(f"  → {itp_ca_out}")
 
     # Step 4: Validation
     print(f"\nValidating outputs...")
-    validate_protein_outputs(work_dir)
+    validate_protein_outputs(work_dir, water_model)
 
     print(f"\n✓ Protein topology at pH {ph} complete")
     return work_dir
@@ -177,18 +185,113 @@ def run_pdb2gmx(
             f.write(result.stderr)
 
 
-def validate_protein_outputs(output_dir: Path) -> None:
+def generate_ca_restraints(
+    structure_file: Path,
+    itp_out: Path,
+    gmx_path: str,
+) -> None:
+    """Generate C-alpha only position restraints."""
+    cmd = [
+        gmx_path,
+        "genrestr",
+        "-f",
+        str(structure_file),
+        "-o",
+        str(itp_out),
+        "-fc",
+        "1000", "1000", "1000",
+    ]
+    
+    work_dir = structure_file.parent
+    try:
+        subprocess.run(
+            cmd,
+            input="C-alpha\n",
+            cwd=str(work_dir),
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as e:
+        log_file = work_dir / "genrestr.log"
+        with open(log_file, "w") as f:
+            f.write(f"Command: {' '.join(cmd)}\n\n")
+            f.write("=== STDOUT ===\n")
+            f.write(e.stdout)
+            f.write("\n=== STDERR ===\n")
+            f.write(e.stderr)
+        raise RuntimeError(f"gmx genrestr failed. See {log_file}")
+
+
+def patch_topology_for_ca_restraints(top_file: Path) -> None:
+    """Add conditional inclusion of posre_ca.itp to the topology."""
+    with open(top_file, "r") as f:
+        lines = f.readlines()
+    
+    itp_ca_path = top_file.parent / "posre_ca.itp"
+    
+    # Check if already patched
+    if any("POSRESca" in line for line in lines):
+        print(f"  ✓ {top_file.name} already includes posre_ca.itp")
+        return
+        
+    # Find where `#ifdef POSRES` block ends
+    insert_idx = -1
+    in_posres = False
+    for i, line in enumerate(lines):
+        if line.startswith("#ifdef POSRES") and "POSRES_WATER" not in line:
+            in_posres = True
+        elif in_posres and line.startswith("#endif"):
+            insert_idx = i + 1
+            break
+            
+    if insert_idx != -1:
+        addition = [
+            "\n; Include C-alpha Position restraint file\n",
+            "#ifdef POSRESca\n",
+            f'#include "{itp_ca_path}"\n',
+            "#endif\n",
+        ]
+        lines[insert_idx:insert_idx] = addition
+        with open(top_file, "w") as f:
+            f.writelines(lines)
+        print(f"  ✓ Patched {top_file.name} to include posre_ca.itp")
+    else:
+        print(f"  ⚠ Warning: Could not find POSRES include block in {top_file.name}")
+
+
+def modify_posre_to_use_macros(itp_file: Path, macro_name: str = "POSRES_FC") -> None:
+    """Modify posre.itp to use the given macro instead of hardcoded force constants."""
+    with open(itp_file, "r") as f:
+        lines = f.readlines()
+
+    with open(itp_file, "w") as f:
+        for line in lines:
+            if not line.startswith(";") and not line.startswith("[") and line.strip():
+                parts = line.split()
+                # A Typical position restraint line:
+                #      1     1  1000  1000  1000
+                if len(parts) >= 5 and parts[1] == "1":
+                    # Reconstruct line with the macro
+                    line = f"{parts[0]:>6} {parts[1]:>5}  {macro_name} {macro_name} {macro_name}\n"
+            f.write(line)
+    print(f"  ✓ Updated {itp_file.name} to use {macro_name} macro")
+
+
+def validate_protein_outputs(output_dir: Path, water_model: str) -> None:
     """Validate protein topology outputs.
 
     Args:
         output_dir: Directory containing protein.gro, protein.top, posre.itp
+        water_model: Name of water model used (e.g., 'opc3', 'tip3p')
     """
     gro_file = output_dir / "protein.gro"
     top_file = output_dir / "protein.top"
     itp_file = output_dir / "posre.itp"
+    itp_ca_file = output_dir / "posre_ca.itp"
 
     # Check existence
-    required_files = [gro_file, top_file, itp_file]
+    required_files = [gro_file, top_file, itp_file, itp_ca_file]
     missing = [f for f in required_files if not f.exists()]
     if missing:
         raise FileNotFoundError(f"Missing output files: {[str(f) for f in missing]}")
@@ -224,7 +327,12 @@ def validate_protein_outputs(output_dir: Path) -> None:
             raise ValueError(f".top missing include: {include}")
 
     water_model_line = None
-    if "amber19sb.ff/opc.itp" in top_content:
+    # Check for exact include (e.g., amber19sb.ff/opc3.itp)
+    expected_water_itp = f"amber19sb.ff/{water_model}.itp"
+    if expected_water_itp in top_content:
+        water_model_line = water_model
+    # Backward compatibility / common fallbacks if exact match fails
+    elif "amber19sb.ff/opc.itp" in top_content:
         water_model_line = "opc"
     elif "amber19sb.ff/tip3p.itp" in top_content:
         water_model_line = "tip3p"
@@ -234,7 +342,9 @@ def validate_protein_outputs(output_dir: Path) -> None:
     if water_model_line:
         print(f"  ✓ .top includes water model: {water_model_line}")
     else:
-        raise ValueError(".top missing water model include")
+        raise ValueError(
+            f".top missing water model include (expected {expected_water_itp})"
+        )
 
     if "[ system ]" not in top_content:
         raise ValueError(".top missing [ system ] section")

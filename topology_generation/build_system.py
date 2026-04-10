@@ -175,7 +175,8 @@ def process_condition(
     # --- Step 4: Solvate ---
     print(f"\n[4] Solvating system...")
     solvated_gro = work_dir / "solvated.gro"
-    run_solvate(gmx_path, current_gro, system_top, solvated_gro, work_dir)
+    water_model = topo_cfg["protein"]["water_model"]
+    run_solvate(gmx_path, current_gro, system_top, solvated_gro, work_dir, water_model)
     print(f"  -> {solvated_gro}")
     current_gro = solvated_gro
 

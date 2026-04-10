@@ -12,4 +12,4 @@ CENTER_NAME=$(echo "$GRO" | sed 's/\.[^.]*$/_center&/')
 echo -e "1\n0" | gmx trjconv -f "$GRO" -s "$TPR" -pbc mol -center -o "$MOL_NAME"
 
 # Re-centre in compact box; centre on Protein, output System
-echo -e "1\n0" | gmx trjconv -f "$MOL_NAME" -s "$TPR" -center -boxcenter zero -ur compact -o "$CENTER_NAME"
+echo -e "1\n0" | gmx trjconv -f "$MOL_NAME" -s "$TPR" -center -pbc mol -boxcenter zero -ur compact -o "$CENTER_NAME"

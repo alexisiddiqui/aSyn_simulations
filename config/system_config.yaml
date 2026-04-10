@@ -1,6 +1,6 @@
 box:
-  size_nm: 10.0
-  shape: cubic   # cubic | dodecahedron
+  size_nm: 15.0
+  shape: dodecahedron   # cubic | dodecahedron
 
 buffer:
   concentration_mm: 20.0

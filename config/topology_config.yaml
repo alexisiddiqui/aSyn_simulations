@@ -1,6 +1,6 @@
 paths:
-  repo_root: "/homes/hussain/hussain-simulation_hdx/projects/aSyn_simulations"
-  gmx: "/ceph/opig-shared/apps/gromacs-2026/bin/gmx"
+  repo_root: "/Users/alexi/Documents/aSyn_simulations"
+  gmx: "/Users/alexi/gromacs-2026/bin/gmx"
   output_dir: "topology_output"
   conda_env: "amber"
   resp_env: "psiresp_fixed"
@@ -14,7 +14,7 @@ charge_settings:
 protein:
   input_pdb: "templates/protein/aSyn_s20_r1_msa1-127_n12700_do1_20260329_025853_protonated_max_plddt_12691.pdb"
   forcefield: "amber19sb"
-  water_model: "opc"
+  water_model: "opc3"
 
 conditions:
   saline:
