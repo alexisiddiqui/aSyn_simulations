@@ -149,7 +149,7 @@ def run_mdrun(gmx_path: str, tpr_file: Path, cwd: Path, label: str = "mdrun") ->
         "-ntmpi",
         "1",
         "-ntomp",
-        "4",
+        "1",
         "-pin",
         "on",
     ]

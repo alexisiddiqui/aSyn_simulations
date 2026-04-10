@@ -1,6 +1,6 @@
 paths:
-  repo_root: "/Users/alexi/Documents/aSyn_simulations"
-  gmx: "/Users/alexi/gromacs-2026/bin/gmx"
+  repo_root: "/homes/hussain/hussain-simulation_hdx/projects/aSyn_simulations"
+  gmx: "/ceph/opig-shared/apps/gromacs-2026/bin/gmx"
   output_dir: "topology_output"
   conda_env: "amber"
   resp_env: "psiresp_fixed"
@@ -19,7 +19,7 @@ protein:
 conditions:
   saline:
     ph: 7.4
-    ligands: [TR1_RESP]
+    ligands: []
   tris:
     ph: 7.4
     ligands: [TR1, TR0]
@@ -41,12 +41,7 @@ ligands:
     charge_method: "bcc"
     description: "Tris+ buffer cation"
 
-  TR1_RESP:
-    mol2: "templates/mol2/tris.mol2"
-    net_charge: 1
-    resname: "TR1"
-    charge_method: "resp"
-    description: "Tris+ buffer cation (RESP)"
+
 
   TR0:
     mol2: "templates/mol2/tris_neutral.mol2"

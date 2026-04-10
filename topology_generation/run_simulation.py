@@ -178,7 +178,9 @@ def process_condition(
 
     for stage in stages_to_run:
         if stage.replicated:
-            run_replicated_stage(stage, work_dir, gmx_path, stages, n_replicates, run_replicate, force)
+            run_replicated_stage(
+                stage, work_dir, gmx_path, stages, n_replicates, run_replicate, force
+            )
         else:
             run_single_stage(stage, work_dir, gmx_path, stages, force)
 
@@ -293,7 +295,12 @@ def run_replicated_stage(
         # Determine input: depends_on or previous non-replicated stage
         if stage.depends_on:
             prev_stage_name = stage.depends_on
-            prev_dir = work_dir / f"{prev_stage_name}_rep{rep}"
+            # Check if the depends_on stage is replicated
+            depends_stage = next((s for s in stages_config if s.name == prev_stage_name), None)
+            if depends_stage and depends_stage.replicated:
+                prev_dir = work_dir / f"{prev_stage_name}_rep{rep}"
+            else:
+                prev_dir = work_dir / prev_stage_name
         else:
             # Find last non-replicated stage before this one
             preceding = [s for s in stages_config if s.name < stage.name and not s.replicated]
@@ -368,7 +375,7 @@ def main():
     parser.add_argument(
         "--n-replicates",
         type=int,
-        default=3,
+        default=1,
         help="Number of replicates for replicated stages",
     )
     parser.add_argument(
