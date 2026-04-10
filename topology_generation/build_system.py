@@ -324,7 +324,10 @@ def main():
         sys_cfg = yaml.safe_load(f)
 
     topo_output_root = repo_root / topo_cfg["paths"]["output_dir"]
-    output_root = args.output if args.output else repo_root / "system_output"
+    
+    # Use config output if not specified in CLI
+    default_output = repo_root / topo_cfg["paths"].get("system_output_dir", "system_output")
+    output_root = args.output if args.output else default_output
     output_root.mkdir(parents=True, exist_ok=True)
 
     gmx_path = topo_cfg["paths"]["gmx"]

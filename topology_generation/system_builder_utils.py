@@ -362,6 +362,7 @@ def run_editconf(
         ],
         work_dir,
         "editconf",
+        stdin="System\n",
     )
 
 

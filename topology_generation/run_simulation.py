@@ -414,8 +414,18 @@ def main():
     if not Path(gmx_path).exists():
         raise FileNotFoundError(f"GROMACS executable not found: {gmx_path}")
 
-    system_root = args.system_output if args.system_output else repo_root / "system_output"
-    output_root = args.output if args.output else system_root / "simulations"
+    # Resolve output roots
+    default_sys_root = repo_root / topo_cfg["paths"].get("system_output_dir", "system_output")
+    system_root = args.system_output if args.system_output else default_sys_root
+    
+    default_sim_root = topo_cfg["paths"].get("simulation_output_dir", "simulation_output")
+    # If simulation_output_dir is relative, put it inside system_root as before
+    # if it's absolute or we want it elsewhere, we could change this logic
+    sim_root_path = Path(default_sim_root)
+    if not sim_root_path.is_absolute():
+        sim_root_path = system_root / default_sim_root
+        
+    output_root = args.output if args.output else sim_root_path
     output_root.mkdir(parents=True, exist_ok=True)
 
     # Determine which conditions to run
