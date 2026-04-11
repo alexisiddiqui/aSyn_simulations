@@ -47,7 +47,7 @@ stages:
     mdp: config/GROMACS/7_relax.mdp
     use_posres_ref: false
     continuation: false
-    replicated: false
+    replicated: true
 
   - name: 8_prod
     mdp: config/GROMACS/8_prod.mdp
