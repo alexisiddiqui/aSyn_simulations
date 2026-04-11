@@ -1,7 +1,7 @@
 paths:
   repo_root: "/home/alexi/Documents/aSyn_simulations"
   gmx: "/home/alexi/gromacs-2026/bin/gmx"
-  output_dir: "topology_output"
+  output_dir: "topology_output_coil"
   system_output_dir: "system_output_coil"
   simulation_output_dir: "simulation_output"
   conda_env: "amber"

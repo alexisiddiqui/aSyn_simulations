@@ -1,7 +1,0 @@
-verbosity 1
-source leaprc.gaff2
-CI2 = loadmol2 /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.mol2
-loadamberparams /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.frcmod
-check CI2
-saveamberparm CI2 /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.prmtop /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.inpcrd
-quit

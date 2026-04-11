@@ -153,6 +153,8 @@ def run_mdrun(gmx_path: str, tpr_file: Path, cwd: Path, label: str = "mdrun") ->
         "1",
         "-ntomp",
         "2",
+        "-update",
+        "gpu",
         "-pin",
         "on",
     ]

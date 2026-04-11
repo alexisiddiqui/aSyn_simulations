@@ -1,7 +1,7 @@
 paths:
   repo_root: "/home/alexi/Documents/aSyn_simulations"
   gmx: "/home/alexi/gromacs-2026/bin/gmx"
-  output_dir: "topology_output"
+  output_dir: "topology_output_rod"
   system_output_dir: "system_output_rod"
   simulation_output_dir: "simulation_output"
   conda_env: "amber"
@@ -14,7 +14,7 @@ charge_settings:
   n_conformers: 1  # For testing, usually 2-5 for RESP
 
 protein:
-  input_pdb: "templates/protein/aSyn_s20_r1_msa1-127_n12700_do1_20260329_025853_protonated_first_frame.pdb"
+  input_pdb: "templates/protein/AF-P37840-F1-model_v6.pdb"
   forcefield: "amber19sb"
   water_model: "opc3"
 
