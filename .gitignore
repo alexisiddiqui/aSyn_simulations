@@ -212,6 +212,6 @@ gromacs-2026.1
 *.tar.gz
 
 # ignore system_output/ and topology_output/ directories
-system_output/
+system_output*/
 topology_output/
 simulation_output/

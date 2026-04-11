@@ -1,5 +1,5 @@
 box:
-  size_nm: 15.0
+  size_nm: 21.0
   shape: dodecahedron   # cubic | dodecahedron
 
 buffer:

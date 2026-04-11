@@ -1,0 +1,7 @@
+verbosity 1
+source leaprc.gaff2
+TR1 = loadmol2 /home/alexi/Documents/aSyn_simulations/topology_output/ligands/TR1/TR1_AC.mol2
+loadamberparams /home/alexi/Documents/aSyn_simulations/topology_output/ligands/TR1/TR1_AC.frcmod
+check TR1
+saveamberparm TR1 /home/alexi/Documents/aSyn_simulations/topology_output/ligands/TR1/TR1_AC.prmtop /home/alexi/Documents/aSyn_simulations/topology_output/ligands/TR1/TR1_AC.inpcrd
+quit

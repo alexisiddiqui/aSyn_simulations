@@ -62,7 +62,9 @@ def run_gmx(gmx_path: str, args: list, cwd: Path, label: str, stdin: str = None)
     print(f"  → {label} complete ({log_file})")
 
 
-def run_make_ndx(gmx_path: str, gro_file: Path, ndx_file: Path, cwd: Path, force: bool = False) -> None:
+def run_make_ndx(
+    gmx_path: str, gro_file: Path, ndx_file: Path, cwd: Path, force: bool = False
+) -> None:
     """Run gmx make_ndx to generate index file.
 
     Args:
@@ -150,7 +152,7 @@ def run_mdrun(gmx_path: str, tpr_file: Path, cwd: Path, label: str = "mdrun") ->
         "-ntmpi",
         "1",
         "-ntomp",
-        "8",
+        "2",
         "-pin",
         "on",
     ]

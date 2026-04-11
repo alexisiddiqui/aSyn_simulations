@@ -1,0 +1,3 @@
+Command: conda run -n amber --no-capture-output parmchk2 -i /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.mol2 -f mol2 -o /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.frcmod -s gaff2
+
+=== STDOUT ===

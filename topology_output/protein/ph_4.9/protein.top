@@ -1,19 +1,19 @@
 ;
-;	File '/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top' was generated
-;	By user: root (501)
-;	On host: Teal.local
-;	At date: Fri Apr 10 23:02:57 2026
+;	File '/home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top' was generated
+;	By user: alexi (1000)
+;	On host: Celestial
+;	At date: Sat Apr 11 14:29:38 2026
 ;
 ;	This is a standalone topology file
 ;
 ;	Created by:
 ;	                    :-) GROMACS - gmx pdb2gmx, 2026.1 (-:
 ;	
-;	Executable:   /Users/alexi/gromacs-2026/bin/gmx
-;	Data prefix:  /Users/alexi/gromacs-2026
-;	Working dir:  /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9
+;	Executable:   /home/alexi/gromacs-2026/bin/gmx
+;	Data prefix:  /home/alexi/gromacs-2026
+;	Working dir:  /home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9
 ;	Command line:
-;	  gmx pdb2gmx -f /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/aSyn_pdb2pqr.pdb -o /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.gro -p /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top -i /Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp -ff amber19sb -water opc3 -ignh
+;	  gmx pdb2gmx -f /home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/aSyn_pdb2pqr.pdb -o /home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.gro -p /home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/protein.top -i /home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp -ff amber19sb -water opc3 -ignh
 ;	Force field was read from the standard GROMACS share directory.
 ;
 
@@ -19092,12 +19092,12 @@ Protein_chain_A     3
 
 ; Include Position restraint file
 #ifdef POSRES
-#include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp"
+#include "/home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre.itp"
 #endif
 
 ; Include C-alpha Position restraint file
 #ifdef POSRESca
-#include "/Users/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre_ca.itp"
+#include "/home/alexi/Documents/aSyn_simulations/topology_output/protein/ph_4.9/posre_ca.itp"
 #endif
 
 ; Include water topology

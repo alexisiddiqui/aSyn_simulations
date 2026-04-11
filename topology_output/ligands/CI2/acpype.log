@@ -1,0 +1,14 @@
+Command: uv run acpype -p /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.prmtop -x /home/alexi/Documents/aSyn_simulations/topology_output/ligands/CI2/CI2_AC.inpcrd -b CI2 -o gmx
+
+=== STDOUT ===
+============================================================================
+| ACPYPE: AnteChamber PYthon Parser interfacE v. 2023.10.27 (c) 2026 AWSdS |
+============================================================================
+Converting Amber input files to Gromacs ...
+==> Writing GROMACS files
+
+==> Disambiguating lower and uppercase atomtypes in GMX top file, even if identical.
+
+==> Writing GMX dihedrals for GMX 4.5 and higher.
+
+Total time of execution: less than a second
